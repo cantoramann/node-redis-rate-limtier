@@ -2,13 +2,10 @@ const express = require("express");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const { rateLimitPreHandler } = require("./middleware/rate");
-const {
-  requestValidationPreHandler,
-} = require("./middleware/request-validation");
-const {
-  responseValidationPostHandler,
-} = require("./middleware/response-validation");
+const { requestValidationPreHandler } = require("./middleware/request-validation");
+const { responseValidationPostHandler } = require("./middleware/response-validation");
 const morgan = require("morgan");
+const { COOKIES } = require("./constants/cookies");
 
 // initialize app
 const app = express();
@@ -23,24 +20,22 @@ app.use(rateLimitPreHandler);
 
 // apply routes
 app.get("/", (req, res) => {
-  res.json({
-    ok: true,
-    data: req.metadata,
-    token: req.metadata.token,
-  });
+   res.json({
+      ok: true,
+      data: req.metadata,
+      token: req.metadata.token,
+   });
 });
 
 app.get("/delete", (req, res) => {
-  res.clearCookie("authentication");
-  res.json({
-    ok: true,
-    cookie: req.cookies["authentication"],
-    token: req.metadata.token,
-  });
+   res.clearCookie(COOKIES.AUTHENTICATION);
+   res.json({
+      ok: true,
+      cookie: req.cookies[COOKIES.AUTHENTICATION],
+      token: req.metadata.token,
+   });
 });
 
 app.use(responseValidationPostHandler);
 
-app.listen(8000, () => {
-  console.log("Server is running on port 8000");
-});
+module.exports = app;
